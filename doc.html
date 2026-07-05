@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading… — Power Apps Dropdowns Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e14;
+    --surface:#111823;
+    --border:#232f3d;
+    --border-bright:#324357;
+    --text:#e7edf4;
+    --text-muted:#8b9bad;
+    --text-dim:#5c6b7d;
+    --accent:#c58cff;
+    --accent-soft:rgba(197,140,255,0.10);
+    --beginner:#4ade80;
+    --intermediate:#5b9dfc;
+    --advanced:#f5a623;
+    --expert:#f2685c;
+    --mono:'JetBrains Mono', ui-monospace, monospace;
+    --sans:'Inter', -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(197,140,255,0.10), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px;}
+  .wrap{max-width:860px; margin:0 auto; padding:0 24px;}
+
+  .topbar{
+    position:sticky; top:0; z-index:10;
+    background:rgba(10,14,20,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width:860px; margin:0 auto; padding:16px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .back-link{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--text-muted);
+    text-decoration:none;
+    display:flex; align-items:center; gap:6px;
+    white-space:nowrap;
+  }
+  .back-link:hover{color:var(--accent);}
+  .source-link{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-dim);
+    text-decoration:none;
+    border:1px solid var(--border);
+    padding:5px 11px;
+    border-radius:20px;
+    white-space:nowrap;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .source-link:hover{color:var(--accent); border-color:var(--accent);}
+
+  #progress{
+    position:fixed; top:0; left:0; height:2px; width:0%;
+    background:var(--accent); transition:width .3s ease; z-index:20;
+  }
+
+  article#content{
+    padding:44px 0 90px;
+    font-size:15.5px;
+  }
+  article#content > *:first-child{margin-top:0;}
+
+  #content h1{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:clamp(24px, 4vw, 34px);
+    line-height:1.2;
+    letter-spacing:-0.01em;
+    margin:0 0 6px;
+  }
+  #content > p:first-of-type{
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin:0 0 30px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--border);
+  }
+  #content h2{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:20px;
+    color:var(--text);
+    margin:44px 0 16px;
+    padding-top:6px;
+    display:flex;align-items:center;gap:10px;
+  }
+  #content h3{
+    font-family:var(--mono);
+    font-weight:600;
+    font-size:16.5px;
+    color:var(--text);
+    margin:30px 0 12px;
+  }
+  #content p{color:var(--text); margin:0 0 16px;}
+  #content ul, #content ol{color:var(--text); margin:0 0 16px; padding-left:22px;}
+  #content li{margin-bottom:6px;}
+  #content li::marker{color:var(--accent);}
+  #content strong{color:#fff;}
+  #content code{
+    font-family:var(--mono); font-size:13px; background:var(--surface);
+    border:1px solid var(--border); padding:2px 6px; border-radius:5px; color:var(--accent);
+  }
+  #content pre{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:16px 18px; overflow-x:auto; margin:0 0 20px;
+  }
+  #content pre code{background:none; border:none; padding:0; color:var(--text); font-size:13px; line-height:1.6;}
+  #content blockquote{
+    border-left:3px solid var(--accent); margin:0 0 18px; padding:4px 0 4px 18px;
+    color:var(--text-muted); font-style:italic;
+  }
+  #content table{width:100%; border-collapse:collapse; margin:0 0 22px; font-size:13.5px;}
+  #content th{
+    text-align:left; padding:9px 12px; background:var(--surface);
+    border:1px solid var(--border); font-family:var(--mono); font-size:11.5px;
+    text-transform:uppercase; letter-spacing:.4px; color:var(--text-muted);
+  }
+  #content td{padding:9px 12px; border:1px solid var(--border); vertical-align:top;}
+  #content hr{border:none; border-top:1px solid var(--border); margin:36px 0;}
+  #content img{max-width:100%; border-radius:8px; border:1px solid var(--border);}
+
+  .loading-state, .error-state{
+    font-family:var(--mono); color:var(--text-dim); padding:60px 0; text-align:center;
+  }
+  .error-state{color:var(--expert);}
+
+  .page-footer{
+    max-width:860px; margin:0 auto; padding:20px 24px 60px;
+    border-top:1px solid var(--border); font-family:var(--mono); font-size:13px;
+  }
+  .page-footer a{color:var(--text-muted); text-decoration:none;}
+  .page-footer a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="index.html">&larr; Back to Index</a>
+    <a class="source-link" id="source-link" href="#" target="_blank" rel="noopener">View source on GitHub &#8599;</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <article id="content">
+    <div class="loading-state">Loading…</div>
+  </article>
+</div>
+
+<footer class="page-footer">
+  <a href="index.html">&larr; Back to the full index</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script>
+  const REPO_OWNER = "Rahul7387";
+  const REPO_NAME = "Power-Apps-Drop-Down-Combo-box-and-Cascaded-Drop-Down";
+  const DEFAULT_FILE = "README.md";
+  const SITE_TITLE = "Power Apps Dropdowns Guide";
+
+  const params = new URLSearchParams(location.search);
+  const currentFile = (params.get('file') || DEFAULT_FILE).replace(/^\/+/, '');
+  const REPO_BLOB = `https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/main/${currentFile}`;
+
+  document.getElementById('source-link').setAttribute('href', REPO_BLOB);
+
+  const progress = document.getElementById('progress');
+  progress.style.width = '30%';
+
+  function resolveRelative(base, href) {
+    const baseDir = base.substring(0, base.lastIndexOf('/') + 1);
+    const resolved = new URL(href, 'https://dummy.local/' + baseDir).pathname;
+    return resolved.replace(/^\/+/, '');
+  }
+
+  fetch(currentFile)
+    .then(res => {
+      if (!res.ok) throw new Error(`Could not load ${currentFile} (${res.status})`);
+      return res.text();
+    })
+    .then(md => {
+      progress.style.width = '75%';
+
+      const titleMatch = md.match(/^#\s+(.+)$/m);
+      if (titleMatch) {
+        document.title = `${titleMatch[1].replace(/[#*`]/g,'')} — ${SITE_TITLE}`;
+      }
+
+      marked.setOptions({ breaks: true, gfm: true });
+      const html = marked.parse(md);
+      const contentEl = document.getElementById('content');
+      contentEl.innerHTML = html;
+
+      function slugify(text) {
+        return text.replace(/[^\w\s-]/g, '').toLowerCase().replace(/\s+/g, '-');
+      }
+      contentEl.querySelectorAll('h2, h3').forEach(h => {
+        if (!h.id) h.id = slugify(h.textContent);
+      });
+
+      contentEl.querySelectorAll('a').forEach(a => {
+        const href = a.getAttribute('href') || '';
+        if (/^https?:\/\//i.test(href) || href.startsWith('#') || href.startsWith('mailto:')) return;
+
+        if (/\.md(#.*)?$/i.test(href)) {
+          const cleanHref = href.replace(/#.*$/, '');
+          const resolvedPath = resolveRelative(currentFile, cleanHref);
+          a.setAttribute('href', `doc.html?file=${resolvedPath}`);
+          return;
+        }
+        if (/index\.html$/i.test(href) || href === './' || href === '/') {
+          a.setAttribute('href', 'index.html');
+          return;
+        }
+      });
+
+      contentEl.querySelectorAll('img').forEach(img => {
+        const src = img.getAttribute('src') || '';
+        if (/^https?:\/\//i.test(src) || src.startsWith('data:')) return;
+        img.setAttribute('src', resolveRelative(currentFile, src));
+      });
+
+      progress.style.width = '100%';
+      setTimeout(() => { progress.style.opacity = '0'; }, 400);
+    })
+    .catch(err => {
+      document.getElementById('content').innerHTML =
+        `<div class="error-state">Couldn't load this page.<br>${err.message}<br><br><a href="index.html">&larr; Back to index</a></div>`;
+      progress.style.opacity = '0';
+    });
+</script>
+
+</body>
+</html>
